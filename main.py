@@ -90,7 +90,7 @@ def get_user(user_id):
     user = db_sess.query(User).get(user_id)
     if user:
         all_post = db_sess.query(Post).filter(Post.creater_id == user_id)
-        return render_template('user.html', title=user.nick, name=user.name, about=user.about, posts=all_post[::-1], id=user_id)
+        return render_template('user.html', title=user.nick, name=user.name, about=user.about, posts=all_post, id=user_id)
     return jsonify({'error': 'user not found'})
 
 
