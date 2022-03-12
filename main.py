@@ -81,7 +81,7 @@ def login():
 def base_site():
     db_sess = db_session.create_session()
     posts = db_sess.query(Post).all()
-    return render_template('index.html', posts=posts[::-1])
+    return render_template('index.html', posts=posts[::-1], title='Twitterus')
 
 
 @app.route('/user/<int:user_id>', methods=['GET', 'POST'])
