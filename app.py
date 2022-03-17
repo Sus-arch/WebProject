@@ -6,6 +6,7 @@ from data.posts import Post
 from flask_login import LoginManager, login_user, logout_user, login_required
 from forms.user import RegisterForm, LoginForm, EditForm
 from forms.post import AddForm
+import os
 
 
 app = Flask(__name__)
@@ -132,7 +133,7 @@ def add_post():
 
 
 def main():
-    db_session.global_init("db/blogs.db")
+    db_session.global_init('postgresql+psycopg2://bbrbtwpqaxydhl:5277854c97e7a033b7366ee28f1e0ea545c28d7a9847ee3429836ce4f088dcbb@ec2-54-228-97-176.eu-west-1.compute.amazonaws.com/d636bmhrs3k5b8')
     app.register_blueprint(posts_api.blueprint)
     app.run(port=8080, host='127.0.0.1')
 
