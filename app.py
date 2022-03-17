@@ -133,7 +133,7 @@ def add_post():
 
 
 def main():
-    db_session.global_init(app.config['SQLALCHEMY_DATABASE_URI'])
+    db_session.global_init('db/blogs.db')
     app.register_blueprint(posts_api.blueprint)
     app.run(port=8080, host='127.0.0.1')
 
