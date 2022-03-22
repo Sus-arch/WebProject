@@ -7,6 +7,7 @@ from flask_login import LoginManager, login_user, logout_user, login_required
 from forms.user import RegisterForm, LoginForm, EditForm
 from forms.post import AddForm
 import os
+from waitress import serve
 
 
 app = Flask(__name__)
@@ -135,7 +136,9 @@ def add_post():
 def main():
     db_session.global_init('db/blogs.db')
     app.register_blueprint(posts_api.blueprint)
-    app.run(port=8080, host='127.0.0.1')
+    port = int(os.environ.get("PORT", 5000))
+    # app.run(port=port, host='0.0.0.0')
+    serve(app, port=port, host='0.0.0.0')
 
 
 if __name__ == '__main__':
