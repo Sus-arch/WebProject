@@ -12,8 +12,10 @@ from waitress import serve
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'NJwadok12LMKF3KMlmcd232v_key'
+URL = os.environ.get('DATABASE_URL').replace("postgres://", "postgresql+psycopg2://", 1)
 login_manager = LoginManager()
 login_manager.init_app(app)
+
 
 
 @app.errorhandler(404)
@@ -134,7 +136,8 @@ def add_post():
 
 
 def main():
-    db_session.global_init('db/blogs.db')
+    # db_session.global_init('db/blogs.db')
+    db_session.global_init(URL)
     app.register_blueprint(posts_api.blueprint)
     port = int(os.environ.get("PORT", 5000))
     # app.run(port=port, host='0.0.0.0')
