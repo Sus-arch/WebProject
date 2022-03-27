@@ -3,16 +3,17 @@ from flask import Flask, render_template, redirect, make_response, jsonify
 from data import db_session, posts_api
 from data.users import User
 from data.posts import Post
+from data.comments import Comment
 from flask_login import LoginManager, login_user, logout_user, login_required
 from forms.user import RegisterForm, LoginForm, EditForm
-from forms.post import AddForm
+from forms.post import AddForm, EditPostForm
 import os
 from waitress import serve
 
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'NJwadok12LMKF3KMlmcd232v_key'
-URL = os.environ.get('DATABASE_URL').replace("postgres://", "postgresql+psycopg2://", 1)
+# URL = os.environ.get('DATABASE_URL').replace("postgres://", "postgresql+psycopg2://", 1)
 login_manager = LoginManager()
 login_manager.init_app(app)
 
@@ -135,13 +136,28 @@ def add_post():
     return render_template('add_post.html', title='Добавить пост', form=form)
 
 
+@app.route('/edit_post/<int:post_id>', methods=['GET', 'POST'])
+def edit_post(post_id):
+    db_sess = db_session.create_session()
+    form = EditPostForm()
+    post = db_sess.query(Post).get(post_id)
+    if form.validate_on_submit():
+        post.title = form.title.data
+        post.text = form.text.data
+        db_sess.commit()
+        return redirect(f'/user/{post.creater_id}')
+    form.title.data = post.title
+    form.text.data = post.text
+    return render_template('edit_post.html', title='Изменить пост', form=form)
+
+
 def main():
-    # db_session.global_init('db/blogs.db')
-    db_session.global_init(URL)
+    db_session.global_init('db/blogs.db')
+    # db_session.global_init(URL)
     app.register_blueprint(posts_api.blueprint)
     port = int(os.environ.get("PORT", 5000))
-    # app.run(port=port, host='0.0.0.0')
-    serve(app, port=port, host='0.0.0.0')
+    app.run(port=port, host='0.0.0.0')
+    # serve(app, port=port, host='0.0.0.0')
 
 
 if __name__ == '__main__':

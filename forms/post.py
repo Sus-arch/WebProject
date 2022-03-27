@@ -7,3 +7,9 @@ class AddForm(FlaskForm):
     title = StringField('Заголовок', validators=[DataRequired()])
     text = TextAreaField('Текст поста', validators=[DataRequired()])
     submit = SubmitField('Добавить пост')
+
+
+class EditPostForm(FlaskForm):
+    title = StringField('Заголовок', validators=[DataRequired()])
+    text = TextAreaField('Текст поста', validators=[DataRequired()])
+    submit = SubmitField('Подтвердить изменения')

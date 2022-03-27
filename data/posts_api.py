@@ -12,14 +12,11 @@ blueprint = flask.Blueprint(
 )
 
 
-@blueprint.route('/api/posts/del/<int:post_id>/<int:user_id>', methods=['GET', 'POST'])
-def del_post(post_id, user_id):
+@blueprint.route('/api/posts/del/<int:post_id>', methods=['GET', 'POST'])
+def del_post(post_id):
     db_sess = db_session.create_session()
-    all_post = db_sess.query(Post).filter(Post.creater_id == user_id)
-    i = 0
-    for post in all_post:
-        if post_id - 1 == i:
-            db_sess.delete(post)
-        i += 1
+    post = db_sess.query(Post).get(post_id)
+    db_sess.delete(post)
     db_sess.commit()
-    return redirect(f'/user/{user_id}')
+    return redirect(f'/user/{post.creater_id}')
+

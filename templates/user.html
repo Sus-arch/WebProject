@@ -11,7 +11,9 @@
 <div class="shadow p-3 mb-5 bg-body rounded">
     <h4>{{ item.title }} ({{ item.create_data }})
     {% if id == current_user.id %}
-        <a class="btn btn-danger" href="/api/posts/del/{{ loop.index }}/{{ id }}">Удалить пост</a>
+        <br>
+        <a class="btn btn-danger" href="/api/posts/del/{{ item.id }}">Удалить пост</a>
+        <a class="btn btn-info" href="/edit_post/{{ item.id }}">Изменить пост</a>
     {% endif %}
     </h4>
     <p>{{ item.text }}</p>
