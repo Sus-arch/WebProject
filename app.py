@@ -7,6 +7,7 @@ from data.comments import Comment
 from flask_login import LoginManager, login_user, logout_user, login_required
 from forms.user import RegisterForm, LoginForm, EditForm
 from forms.post import AddForm, EditPostForm
+from forms.comment import AddCommentForm
 import os
 from waitress import serve
 
@@ -82,11 +83,22 @@ def login():
     return render_template('login.html', title='Авторизация', form=form)
 
 
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def base_site():
     db_sess = db_session.create_session()
     posts = db_sess.query(Post).all()
-    return render_template('index.html', posts=posts[::-1], title='Twitterus')
+    comments = db_sess.query(Comment).all()
+    form = AddCommentForm()
+    if form.validate_on_submit():
+        comment = Comment(
+            text=form.text.data,
+            main_post=form.main_post.data,
+            creater_id=flask_login.current_user.id
+        )
+        db_sess.add(comment)
+        db_sess.commit()
+        return redirect('/')
+    return render_template('index.html', posts=posts[::-1], comments=comments, title='Twitterus', form=form)
 
 
 @app.route('/user/<int:user_id>', methods=['GET', 'POST'])
@@ -95,7 +107,18 @@ def get_user(user_id):
     user = db_sess.query(User).get(user_id)
     if user:
         all_post = db_sess.query(Post).filter(Post.creater_id == user_id)
-        return render_template('user.html', title=user.nick, name=user.name, about=user.about, posts=all_post, id=user_id)
+        comments = db_sess.query(Comment).all()
+        form = AddCommentForm()
+        if form.validate_on_submit():
+            comment = Comment(
+                text=form.text.data,
+                main_post=form.main_post.data,
+                creater_id=flask_login.current_user.id
+            )
+            db_sess.add(comment)
+            db_sess.commit()
+            return redirect(f'/user/{user_id}')
+        return render_template('user.html', title=user.nick, name=user.name, about=user.about, posts=all_post, id=user_id, comments=comments, form=form)
     return jsonify({'error': 'user not found'})
 
 
