@@ -135,6 +135,7 @@ def edit_user(user_id):
         user.name = form.name.data
         user.nick = form.nick.data
         user.about = form.about.data
+
         db_sess.commit()
         return redirect('/')
     form.name.data = user.name
