@@ -127,6 +127,10 @@ def edit_user(user_id):
     db_sess = db_session.create_session()
     user = db_sess.query(User).get(user_id)
     form = EditForm()
+    if not user:
+        return jsonify({'error': 'user not found'})
+    if not flask_login.current_user.is_authenticated or flask_login.current_user.id != user.id:
+        return jsonify({'error': 'access denied'})
     if form.validate_on_submit():
         if db_sess.query(User).filter(User.nick == form.nick.data).first() and user.nick != form.nick.data:
             return render_template('edit.html', title='Регистрация',
@@ -147,6 +151,8 @@ def edit_user(user_id):
 @app.route('/add_post', methods=['GET', 'POST'])
 def add_post():
     form = AddForm()
+    if not flask_login.current_user.is_authenticated:
+        return jsonify({'error': 'not logged in'})
     if form.validate_on_submit():
         post = Post(
             title=form.title.data,
@@ -165,6 +171,10 @@ def edit_post(post_id):
     db_sess = db_session.create_session()
     form = EditPostForm()
     post = db_sess.query(Post).get(post_id)
+    if not post:
+        return jsonify({'error': 'post not found'})
+    if not flask_login.current_user.is_authenticated or flask_login.current_user.id != post.creater_id:
+        return jsonify({'error': 'access denied'})
     if form.validate_on_submit():
         post.title = form.title.data
         post.text = form.text.data
@@ -175,13 +185,46 @@ def edit_post(post_id):
     return render_template('edit_post.html', title='Изменить пост', form=form)
 
 
+@app.route('/delete_post/<int:post_id>/<int:page>', methods=['GET', 'POST'])
+def delete_post(post_id, page):
+    db_sess = db_session.create_session()
+    post = db_sess.query(Post).get(post_id)
+    if not post:
+        return jsonify({'error': 'post not found'})
+    if not flask_login.current_user.is_authenticated or flask_login.current_user.id != post.creater_id:
+        return jsonify({'error': 'access denied'})
+    db_sess.delete(post)
+    db_sess.commit()
+    if page == 1:
+        return redirect('/')
+    elif page == 2:
+        return redirect(f'/user/{post.creater_id}')
+
+
+@app.route('/comment/delete/<int:com_id>/<int:page>', methods=['GET', 'POST'])
+def delete_comment(com_id, page):
+    db_sess = db_session.create_session()
+    com = db_sess.query(Comment).get(com_id)
+    if not com:
+        return jsonify({'error': 'comment not found'})
+    if not flask_login.current_user.is_authenticated or flask_login.current_user.id != com.creater_id:
+        return jsonify({'error': 'access denied'})
+    db_sess.delete(com)
+    db_sess.commit()
+    if page == 1:
+        return redirect('/')
+    elif page == 2:
+        main_post = db_sess.query(Post).get(com.main_post)
+        return redirect(f"/user/{main_post.creater_id}")
+
+
 def main():
     db_session.global_init('db/blogs.db')
     # db_session.global_init(URL)
     app.register_blueprint(posts_api.blueprint)
     port = int(os.environ.get("PORT", 5000))
-    # app.run(port=port, host='0.0.0.0')
-    serve(app, port=port, host='0.0.0.0')
+    app.run(port=port, host='0.0.0.0')
+    # serve(app, port=port, host='0.0.0.0')
 
 
 if __name__ == '__main__':

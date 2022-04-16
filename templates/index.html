@@ -9,6 +9,9 @@
     </h4>
     <p>{{ item.text }}</p>
     <div align="right">
+        {% if current_user.is_authenticated and current_user.id == item.creater_id %}
+            <a class="btn btn-danger" href="/delete_post/{{ item.id }}/1" role="button">Удалить пост</a>
+        {% endif %}
         <p>{{ item.create_data }}</p>
         <a href="/user/{{ item.creater_id }}" class="link-primary">Автор</a>
     </div>
@@ -41,6 +44,9 @@
               <p>
                   {{ com.text }}
                   <div align="right">
+                        {% if current_user.is_authenticated and current_user.id == com.creater_id %}
+                            <a class="btn btn-danger" href="/comment/delete/{{ com.id }}/1" role="button">Удалить комментарий</a>
+                        {% endif %}
                         <p>{{ com.create_data }}</p>
                         <a href="/user/{{ com.creater_id }}" class="link-primary">Автор</a>
                   </div>

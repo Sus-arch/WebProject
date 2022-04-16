@@ -10,14 +10,14 @@
 {% for item in posts %}
 <div class="shadow p-3 mb-5 bg-body rounded">
     <h4>{{ item.title }}
-    {% if id == current_user.id %}
-        <br>
-        <a class="btn btn-danger" href="/api/posts/del/{{ item.id }}">Удалить пост</a>
-        <a class="btn btn-info" href="/edit_post/{{ item.id }}">Изменить пост</a>
-    {% endif %}
     </h4>
     <p>{{ item.text }}</p>
     <div align="right">
+        {% if id == current_user.id %}
+            <a class="btn btn-danger" href="/delete_post/{{ item.id }}/2">Удалить пост</a>
+            <a class="btn btn-info" href="/edit_post/{{ item.id }}">Изменить пост</a>
+            <br>
+        {% endif %}
         <p>{{ item.create_data }}</p>
     </div>
     {% if current_user.is_authenticated %}
@@ -49,6 +49,9 @@
               <p>
                   {{ com.text }}
                   <div align="right">
+                        {% if current_user.is_authenticated and current_user.id == com.creater_id %}
+                            <a class="btn btn-danger" href="/comment/delete/{{ com.id }}/2" role="button">Удалить комментарий</a>
+                        {% endif %}
                         <p>{{ com.create_data }}</p>
                         <a href="/user/{{ com.creater_id }}" class="link-primary">Автор</a>
                   </div>
