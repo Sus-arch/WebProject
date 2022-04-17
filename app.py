@@ -238,8 +238,8 @@ def main():
     # db_session.global_init(URL)
     app.register_blueprint(posts_api.blueprint)
     port = int(os.environ.get("PORT", 5000))
-    app.run(port=port, host='0.0.0.0')
-    # serve(app, port=port, host='0.0.0.0')
+    # app.run(port=port, host='0.0.0.0')
+    serve(app, port=port, host='0.0.0.0')
 
 
 if __name__ == '__main__':
