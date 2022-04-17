@@ -1,5 +1,5 @@
 import flask_login
-from flask import Flask, render_template, redirect, make_response, jsonify
+from flask import Flask, render_template, redirect, make_response, jsonify, request
 from data import db_session, posts_api
 from data.users import User
 from data.posts import Post
@@ -10,6 +10,7 @@ from forms.post import AddForm, EditPostForm
 from forms.comment import AddCommentForm
 import os
 from waitress import serve
+from utils.file_reader import get_text
 
 
 app = Flask(__name__)
@@ -17,7 +18,6 @@ app.config['SECRET_KEY'] = 'NJwadok12LMKF3KMlmcd232v_key'
 # URL = os.environ.get('DATABASE_URL').replace("postgres://", "postgresql+psycopg2://", 1)
 login_manager = LoginManager()
 login_manager.init_app(app)
-
 
 
 @app.errorhandler(404)
@@ -154,10 +154,25 @@ def add_post():
     if not flask_login.current_user.is_authenticated:
         return jsonify({'error': 'not logged in'})
     if form.validate_on_submit():
+        if not form.text.data and not request.files['file']:
+            return render_template('add_post.html', title='Добавить пост',
+                                   form=form, message='Нельзя создать пост без текста')
+        text = ''
+        if form.text.data:
+            text = form.text.data + '\n'
+        if request.files['file']:
+            file = request.files['file']
+            path = os.path.join('uploads', file.filename)
+            file.save(path)
+            text += get_text(path)
+            if not text:
+                return render_template('add_post.html', title='Добавить пост',
+                                       form=form, message='Некорректный файл')
+            os.remove(path)
         post = Post(
             title=form.title.data,
             creater_id=flask_login.current_user.id,
-            text=form.text.data
+            text=text
         )
         db_sess = db_session.create_session()
         db_sess.add(post)

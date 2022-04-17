@@ -12,3 +12,4 @@ SQLAlchemy-serializer==1.4.1
 MarkupSafe==2.1.0
 psycopg2==2.9.3
 waitress==2.1.1
+python-docx==0.8.11
