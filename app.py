@@ -164,10 +164,10 @@ def add_post():
             file = request.files['file']
             path = os.path.join('uploads', file.filename)
             file.save(path)
-            text += get_text(path)
             if not text:
                 return render_template('add_post.html', title='Добавить пост',
                                        form=form, message='Некорректный файл')
+            text += get_text(path)
             os.remove(path)
         post = Post(
             title=form.title.data,
