@@ -164,7 +164,7 @@ def add_post():
             file = request.files['file']
             path = os.path.join('uploads', file.filename)
             file.save(path)
-            if not text:
+            if not get_text(path):
                 os.remove(path)
                 return render_template('add_post.html', title='Добавить пост',
                                        form=form, message='Некорректный файл')

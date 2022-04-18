@@ -15,3 +15,5 @@ def get_text(filename):
         return None
     except UnicodeDecodeError:
         return None
+    except:
+        return None
